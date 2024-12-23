@@ -24,7 +24,10 @@
    cd algorithms-and-data-structures/lab3
 4. Запустите программу
    ```bash
-   python src/task*.py
+   python src/task.py
+5. Запустите тесты
+   ```bash
+   pytest
 
 ### Автор ###
    Заботкина Марина Александровна
