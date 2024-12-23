@@ -20,10 +20,13 @@
    git clone https://github.com/Marinasunshine/algorithms-and-data-structures.git
 2. Перейдите в папку с проектом
    ```bash
-   cd algorithms-and-data-structures/lab3
+   cd algorithms-and-data-structures/lab7
 4. Запустите программу
    ```bash
    python src/task.py
+5. Запустите тесты
+   ```bash
+   pytest
 
 ### Автор ###
    Заботкина Марина Александровна
