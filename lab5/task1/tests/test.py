@@ -1,50 +1,43 @@
-import time
 import unittest
-from lab5.utils import read_data, write_data, generations
-import tracemalloc
+import utils
 from lab5.task1.src.task1 import check_heap
 
-generations("heap", 5, 0,"C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab5/task1/txtf/input.txt")
+class TestCheckHeap(unittest.TestCase):
 
-def print_time_memory(func):
-    n, data = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab5/task1/txtf/input.txt", 1)
+    def test_valid_heap(self):
+        arr = [1, 3, 2, 5, 4]
+        expected = "YES"
+        self.assertEqual(check_heap(arr), expected)
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_invalid_heap(self):
+        arr = [0, 1, 2, 0]
+        expected = "NO"
+        self.assertEqual(check_heap(arr), expected)
 
-    func(data)
+    def test_single_element(self):
+        arr = [5]
+        expected = "YES"
+        self.assertEqual(check_heap(arr), expected)
 
-    print("memory usage task 1: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+    def test_large_heap(self):
+        arr = [i for i in range(1, 100001)]
+        expected = "YES"
+        self.assertEqual(check_heap(arr), expected)
 
-    tracemalloc.stop()
+    def test_large_invalid_heap(self):
+        arr = [1] + [0] * 99999
+        expected = "NO"
+        self.assertEqual(check_heap(arr), expected)
 
-    write_data(func(data), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab5/task1/txtf/output.txt")
-    print(n, data)
-    print(func(data))
-    print("\n")
-    return memory, times
+    def test_should_time_memory(self):
+        time_start = utils.start_tracking()
 
+        arr = [i for i in range(1, 10**4 + 1)]
+        check_heap(arr)
 
-class TestTask(unittest.TestCase):
+        time, memory = utils.return_time_memory(time_start)
+        self.assertLess(time, 2)
+        self.assertLess(memory, 256)
 
-    def test_should_check_time_memori_max_value(self):
-        expected_memory = 256
-        expected_time = 2
-        m, t = print_time_memory(check_heap)
-
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
-
-    def test_correct_work(self):
-        self.assertEqual(check_heap([1, 0, 1, 2, 0]), "NO")
-        self.assertEqual(check_heap([5, 3, 4, 2, 1]), "NO")
-        self.assertEqual(check_heap([7, 8, 9, 10, 11, 12, 13]), "YES")
-        self.assertEqual(check_heap([10, 1, 2, 5, 6, 3, 4]), "NO")
-        self.assertEqual(check_heap([20, 15, 18, 10, 12, 14, 16]), "NO")
-        self.assertEqual(check_heap([1, 3, 2, 5, 4]), "YES")
-        self.assertEqual(check_heap([1, 4, 9, 16, 25, 36, 49]), "YES")
-
-
+if __name__ == '__main__':
+    unittest.main()

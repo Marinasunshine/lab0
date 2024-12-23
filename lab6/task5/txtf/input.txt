@@ -1,5 +1,5 @@
-McCain 5
-tourist 3
-ivanov 5
-petr 1
-McCain 3
+tourist 4
+Obama 5
+tourist 4
+Obama 1
+McCain 1

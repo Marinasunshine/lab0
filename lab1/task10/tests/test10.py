@@ -1,42 +1,65 @@
-import time
-import tracemalloc
+import unittest
+import utils
+from lab1.task10.src.task10 import palindrome
 
-start = time.perf_counter()
-tracemalloc.start()
+class LongestPalindromeTest(unittest.TestCase):
 
-f = open('../txtf/input.txt', 'r')
-n = int(f.readline())
-s = f.readline()
-f.close()
+    def test_should_example_1(self):
+        # given
+        input_data = ("AAB")
+        expected_result = "ABA"
 
-if not 1 <= n <= 10**5:
-    with open('../txtf/output.txt', 'w') as f:
-        f.write('Число не входит в допустимый диапазон')
-    exit()
+        # when
+        result = palindrome(input_data)
 
-counts = {}
-for symbol in s:
-    if symbol in counts:
-        counts[symbol] += 1
-    else:
-        counts[symbol] = 1
+        # then
+        self.assertEqual(expected_result, result)
 
-left_part = []
-middle_symbol = ''
+    def test_should_example_2(self):
+        # given
+        input_data = ("QAZQAZ")
+        expected_result = "AQZZQA"
 
-for symbol in sorted(counts.keys()):
-    count = counts[symbol]
-    left_part.append(symbol * (count // 2))
-    if count % 2 == 1 and middle_symbol == '':
-        middle_symbol = symbol
+        # when
+        result = palindrome(input_data)
 
-left = ''.join(left_part)
-palindrome = left + middle_symbol + left[::-1]
+        # then
+        self.assertEqual(expected_result, result)
 
-f = open('../txtf/output.txt', 'w')
-f.write(palindrome)
-f.close()
+    def test_should_example_3(self):
+        # given
+        input_data = ("A")
+        expected_result = "A"
 
-print(time.perf_counter() - start, 'c')
-print(tracemalloc.get_traced_memory()[1] / 1024 / 1024, 'Mb')
+        # when
+        result = palindrome(input_data)
 
+        # then
+        self.assertEqual(expected_result, result)
+
+    def test_should_edge_case_empty(self):
+        # given
+        input_data = ("")
+        expected_result = ""
+
+        # when
+        result = palindrome(input_data)
+
+        # then
+        self.assertEqual(expected_result, result)
+
+    def test_should_time_memory(self):
+        # given
+        input_data = ("A" * 100000)
+        time_start = utils.start_tracking()
+
+        # when
+        palindrome(input_data)
+        result = utils.return_time_memory(time_start)
+
+        # then
+        self.assertLess(result[0], 1)
+        self.assertLess(result[1], 64)
+
+if __name__ == '__main__':
+    unittest.main()

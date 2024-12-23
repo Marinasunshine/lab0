@@ -1,39 +1,69 @@
-import time
 import unittest
-from lab6.utils import read_data, write_data_2, generations
-import tracemalloc
+import utils
 from lab6.task2.src.task2 import phonebook_manager
 
-generations("phone", 10, "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab6/task2/txtf/input.txt")
+class TestPhoneBookManager(unittest.TestCase):
 
-def print_time_memory(func):
-    n, data = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab6/task2/txtf/input.txt", 1)
+    def test_add_and_find(self):
+        commands = [
+            "add 911 police",
+            "add 76213 Mom",
+            "add 17239 Bob",
+            "find 76213",
+            "find 911",
+            "find 17239"
+        ]
+        expected = ["Mom", "police", "Bob"]
+        self.assertEqual(phonebook_manager(commands), expected)
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_find_not_found(self):
+        commands = [
+            "find 910"
+        ]
+        expected = ["not found"]
+        self.assertEqual(phonebook_manager(commands), expected)
 
-    func(data)
+    def test_delete_and_find(self):
+        commands = [
+            "add 911 police",
+            "del 911",
+            "find 911"
+        ]
+        expected = ["not found"]
+        self.assertEqual(phonebook_manager(commands), expected)
 
-    print("memory usage task 2: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+    def test_overwrite_contact(self):
+        commands = [
+            "add 76213 Mom",
+            "add 76213 daddy",
+            "find 76213"
+        ]
+        expected = ["daddy"]
+        self.assertEqual(phonebook_manager(commands), expected)
 
-    tracemalloc.stop()
+    def test_complex_operations(self):
+        commands = [
+            "add 123456 me",
+            "add 0 granny",
+            "find 0",
+            "find 123456",
+            "del 0",
+            "find 0",
+            "del 0",
+            "find 0"
+        ]
+        expected = ["granny", "me", "not found", "not found"]
+        self.assertEqual(phonebook_manager(commands), expected)
 
-    write_data_2(func(data), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab6/task2/txtf/output.txt")
-    print(n, data)
-    print(func(data))
-    print("\n")
-    return memory, times
+    def test_should_time_memory(self):
+        time_start = utils.start_tracking()
 
+        commands = [f"add {i} name{i}" for i in range(5 * 10**4)] + [f"find {i}" for i in range(5 * 10**4)]
+        phonebook_manager(commands)
 
-class TestTask(unittest.TestCase):
+        time, memory = utils.return_time_memory(time_start)
+        self.assertLess(time, 6)
+        self.assertLess(memory, 512)
 
-    def test_should_check_time_memori(self):
-        expected_memory = 512
-        expected_time = 6
-        m, t = print_time_memory(phonebook_manager)
-
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
+if __name__ == '__main__':
+    unittest.main()

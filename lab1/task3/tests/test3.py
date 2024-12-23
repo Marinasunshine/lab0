@@ -1,37 +1,32 @@
-import time
-import tracemalloc
+import unittest
+import utils
+from lab1.task3.src.task3 import insertion_sort
 
-start = time.perf_counter()
-tracemalloc.start()
+class DescendingInsertionSortTest(unittest.TestCase):
 
-f = open('../txtf/input.txt')
-n = int(f.readline())
-a = list(map(int, f.readline().split()))
-f.close()
+    def test_should_example(self):
+        # given
+        array = [1,2,3,4,5,6,7,8,9,10]
+        expected_result = [10,9,8,7,6,5,4,3,2,1]
 
-if not 1 <= n <= 10**3:
-    with open('../txtf/output.txt', 'w') as f:
-        f.write('Число не входит в допустимый диапазон')
-    exit()
+        # when
+        insertion_sort(array, 10)
 
-for element in a:
-    if abs(element) > 10 ** 9:
-        with open('../txtf/output.txt', 'w') as f:
-            f.write('Число превосходит допустимое значение')
-        exit()
+        # then
+        self.assertEqual(expected_result, array)
 
-for i in range(1, n):
-    curr_el = a[i]
-    j = i - 1
-    while j >= 0 and a[j] < curr_el:
-        a[j + 1] = a[j]
-        j -= 1
-    a[j + 1] = curr_el
+    def test_should_time_memory(self):
+        # given
+        array = [x for x in range(10**3)]
+        time_start = utils.start_tracking()
 
-f = open('../txtf/output.txt', 'w')
-f.write(' '.join(map(str, a)))
-f.close()
+        # when
+        insertion_sort(array, 10**3)
+        result = utils.return_time_memory(time_start)
 
-print(time.perf_counter() - start, 'c')
-print(tracemalloc.get_traced_memory()[1] / 1024 / 1024, 'Mb')
+        # then
+        self.assertLess(result[0], 2)
+        self.assertLess(result[1], 256)
 
+if __name__ == '__main__':
+    unittest.main()

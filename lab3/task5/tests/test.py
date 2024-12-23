@@ -1,47 +1,47 @@
-import time
 import unittest
-from lab3.utils import *
-import tracemalloc
 from lab3.task5.src.task5 import h_index
+import utils
 
-generations("h", 10, 0, "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab3/task5/txtf/input.txt")
+class TestHIndex(unittest.TestCase):
 
-def print_time_memory(func):
-    data = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab3/task5/txtf/input.txt", 5)
+    def test_smallest_case(self):
+        citations = [3, 0, 6, 1, 5]
+        expected = 3
+        self.assertEqual(h_index(citations), expected)
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_small_case(self):
+        citations = [1, 3, 1]
+        expected = 1
+        self.assertEqual(h_index(citations), expected)
 
-    func(data)
+    def test_case_with_n_equals_4(self):
+        citations = [10, 8, 5, 4, 3]
+        expected = 4
+        self.assertEqual(h_index(citations), expected)
 
-    print("memory usage task 5: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+    def test_case_with_n_equals_5(self):
+        citations = [100, 90, 80, 70, 60]
+        expected = 5
+        self.assertEqual(h_index(citations), expected)
 
-    tracemalloc.stop()
+    def test_case_with_decreasing_citations(self):
+        citations = [7, 6, 5, 4, 3, 2, 1]
+        expected = 4
+        self.assertEqual(h_index(citations), expected)
 
-    write_data(func(data), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab3/task5/txtf/output.txt")
-    print(data)
-    print(func(data))
-    print("\n")
-    return memory, times
+    def test_edge_case_large_citations(self):
+        citations = [0] * 1000 + [1]
+        expected = 1
+        self.assertEqual(h_index(citations), expected)
 
+    def test_should_time_memory(self):
+        citations = [i for i in range(5000, 0, -1)]  # Large case
+        time_start = utils.start_tracking()
+        h_index(citations)
+        time, memory = utils.return_time_memory(time_start)
 
-class TestTask(unittest.TestCase):
+        self.assertLess(time, 2)
+        self.assertLess(memory, 256)
 
-    def test_should_check_time_memori_value(self):
-        expected_memory = 256
-        expected_time = 2
-        m, t = print_time_memory(h_index)
-
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
-
-    def test_correct_work(self):
-        self.assertEqual(h_index([3, 0, 6, 1, 5]), 3)
-        self.assertEqual(h_index([5, 5, 5, 5]), 4)
-        self.assertEqual(h_index([1, 3, 1]), 1)
-        self.assertEqual(h_index([0, 0, 0]), 0)
-        self.assertEqual(h_index([1000, 500, 200, 100, 50]), 5)
-        self.assertEqual(h_index([15, 3, 5, 6, 7, 12, 18, 1, 3, 2]), 5)
+if __name__ == "__main__":
+    unittest.main()

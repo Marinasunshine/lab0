@@ -1,40 +1,62 @@
-import time
 import unittest
-from lab4.utils import read_data, write_data, generations
-import tracemalloc
+import utils
 from lab4.task1.src.task1 import stacks
 
-generations("stack", 5, 0,"C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab4/task1/txtf/input.txt")
+class TestStacks(unittest.TestCase):
 
-def print_time_memory(func):
-    n, data = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab4/task1/txtf/input.txt", 1)
+    def test_empty_commands(self):
+        commands = []
+        expected = []
+        self.assertEqual(stacks(commands), expected)
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_single_push_and_pop(self):
+        commands = [
+            "+ 10",
+            "-"
+        ]
+        expected = [10]
+        self.assertEqual(stacks(commands), expected)
 
-    func(data)
+    def test_multiple_push_and_pop(self):
+        commands = [
+            "+ 1",
+            "+ 2",
+            "+ 3",
+            "-",
+            "-",
+            "-"
+        ]
+        expected = [3, 2, 1]
+        self.assertEqual(stacks(commands), expected)
 
-    print("memory usage task 1: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+    def test_alternating_push_and_pop(self):
+        commands = [
+            "+ 5",
+            "-",
+            "+ 7",
+            "-",
+            "+ 9",
+            "-"
+        ]
+        expected = [5, 7, 9]
+        self.assertEqual(stacks(commands), expected)
 
-    tracemalloc.stop()
+    def test_large_input(self):
+        n = 10**6
+        commands = [f"+ {i}" for i in range(1, n + 1)] + ["-"] * n
+        expected = list(range(n, 0, -1))
+        self.assertEqual(stacks(commands), expected)
 
-    write_data(func(data), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab4/task1/txtf/output.txt")
-    print(n, data)
-    print(func(data))
-    print("\n")
-    return memory, times
+    def test_should_time_memory(self):
+        n = 10**6
+        commands = [f"+ {i}" for i in range(1, n + 1)] + ["-"] * n
 
+        time_start = utils.start_tracking()
+        stacks(commands)
+        time, memory = utils.return_time_memory(time_start)
 
-class TestTask(unittest.TestCase):
+        self.assertLess(time, 2)
+        self.assertLess(memory, 256)
 
-    def test_should_check_time_memori(self):
-        expected_memory = 256
-        expected_time = 2
-        m, t = print_time_memory(stacks)
-
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
-
+if __name__ == "__main__":
+    unittest.main()

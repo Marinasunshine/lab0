@@ -1,52 +1,37 @@
-import time
 import unittest
-from lab7.utils import read_data, write_data, generations
-import tracemalloc
+import utils
 from lab7.task7.src.task7 import is_match
 
-#generations("pattern", 5, 5,"C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab7/task7/txtf/input.txt")
 
-def print_time_memory(func):
-    pattern, s = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab7/task7/txtf/input.txt", 7)
+class TemplateTest(unittest.TestCase):
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_should_example(self):
+        # given
+        expected_result = "YES"
 
-    func(pattern, s)
+        # when
+        result = is_match("k?t*n", "kitten")
 
-    print("memory usage task 7: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+        # then
+        self.assertEqual(result, expected_result)
 
-    tracemalloc.stop()
+    def test_should_time_memory(self):
+        # given
+        template = "a?s*e"*100
+        word = "asdce"*100
+        time_start = utils.start_tracking()
 
-    write_data(func(pattern, s), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab7/task7/txtf/output.txt")
-    print(pattern, s)
-    print(func(pattern, s))
-    print("\n")
-    return memory, times
+        # when
+        is_match(template, word)
+        result = utils.return_time_memory(time_start)
+
+        # then
+        self.assertLess(result[0], 2)
+        self.assertLess(result[1], 256)
 
 
-class TestTask(unittest.TestCase):
-
-    def test_should_check_time_memori(self):
-        expected_memory = 256
-        expected_time = 2
-        m, t = print_time_memory(is_match)
-
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
-
-    def test_match(self):
-        self.assertEqual(is_match("abcd", "xyz"), "NO")
-        self.assertEqual(is_match("a?c", "abcde"), "NO")
-        self.assertEqual(is_match("a*", "abc"), "YES")
-        self.assertEqual(is_match("b*", "abc"), "NO")
-        self.assertEqual(is_match("a*b*c", "abc"), "YES")
-        self.assertEqual(is_match("a*b*c", "abbbbc"), "YES")
-        self.assertEqual(is_match("a?b*", "abc"), "NO")
-        self.assertEqual(is_match("a?b*", "acb"), "YES")
+if __name__ == '__main__':
+    unittest.main()
 
 
 

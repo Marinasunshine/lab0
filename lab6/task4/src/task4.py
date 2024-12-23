@@ -1,3 +1,6 @@
+import utils
+import os
+
 def array_command(operations):
     data = {}
     order = {}
@@ -40,7 +43,7 @@ def array_command(operations):
         return data[order[key][1]]
 
     for op in operations:
-        parts = op
+        parts = op.split()
         cmd, key = parts[0], parts[1]
         if cmd == "put":
             value = parts[2]
@@ -59,3 +62,18 @@ def array_command(operations):
             result.append(find_next(key))
 
     return result
+
+if __name__ == '__main__':
+    print("Lab 6 Task 4:")
+    time_start = utils.start_tracking()
+    input_path, output_path = utils.get_file_paths(os.path.abspath(__file__))
+
+    data = utils.read_from_file(input_path, type=str)
+    data = data.split("\n")
+    result = array_command(data[1:])
+
+    print(f"Input: {data}")
+    print(f"Output: {result}")
+
+    utils.write_in_file(output_path, result, split_str="\n")
+    utils.print_time_memory(time_start)

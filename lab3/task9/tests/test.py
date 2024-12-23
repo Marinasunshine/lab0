@@ -1,47 +1,42 @@
-import time
 import unittest
-from lab3.utils import *
-import tracemalloc
 from lab3.task9.src.task9 import find_closest_pair
+import utils
 
-#generations("points", 5, 0, "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab3/task9/txtf/input.txt")
+class TestFindClosestPair(unittest.TestCase):
 
-def print_time_memory(func):
-    n, points = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab3/task9/txtf/input.txt",9)
+    def test_smallest_case(self):
+        points = [(0, 0), (3, 4)]
+        expected = 5.0
+        self.assertAlmostEqual(find_closest_pair(points), expected, places=4)
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_multiple_pairs(self):
+        points = [(7, 7), (1, 100), (4, 8), (7, 7)]
+        expected = 0.0
+        self.assertAlmostEqual(find_closest_pair(points), expected, places=4)
 
-    func(points)
+    def test_case_with_negative_coords(self):
+        points = [(4, 4), (-2, -2), (-3, -4), (-1, 3)]
+        expected = 2.23606797749979
+        self.assertAlmostEqual(find_closest_pair(points), expected, places=4)
 
-    print("memory usage task 9: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+    def test_case_with_duplicate_points(self):
+        points = [(-1, -1), (-2, -2), (-2, 4), (-1, 3)]
+        expected = 1.41421356
+        self.assertAlmostEqual(find_closest_pair(points), expected, places=4)
 
-    tracemalloc.stop()
+    def test_edge_case_large_points(self):
+        points = [(0, 0)] * 1000 + [(1, 1)]
+        expected = 0.0
+        self.assertAlmostEqual(find_closest_pair(points), expected, places=4)
 
-    write_data(func(points), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab3/task9/txtf/output.txt")
-    print(n, points)
-    print(func(points))
-    print("\n")
-    print("----------------------")
-    return memory, times
+    def test_should_time_memory(self):
+        points = [(i, i * i) for i in range(5000, 0, -1)]
+        time_start = utils.start_tracking()
+        find_closest_pair(points)
+        time, memory = utils.return_time_memory(time_start)
 
+        self.assertLess(time, 10)
+        self.assertLess(memory, 256)
 
-class TestTask(unittest.TestCase):
-
-    def test_should_check_time_memori_value(self):
-        expected_memory = 256
-        expected_time = 10
-        m, t = print_time_memory(find_closest_pair)
-
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
-
-    def test_correct_work(self):
-        self.assertAlmostEqual(find_closest_pair([(0, 0), (3, 4)]), 5.0000,  places=4)
-        self.assertAlmostEqual(find_closest_pair([(7, 7), (1, 100), (4, 8), (7, 7)]), 0.0000,  places=4)
-        self.assertAlmostEqual(find_closest_pair([(4, 4), (-2, -2), (-3, -4), (-1, 3), (2, 3), (-4, 0), (1, 1), (-1, -1), (3, -1), (-4, 2), (-2, 4)]), 1.4142,  places=4)
-        self.assertAlmostEqual(find_closest_pair([(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0)]), 1.0000,  places=4)
-        self.assertAlmostEqual(find_closest_pair([(0, 0), (100, 100), (200, 200), (-100, -100), (50, 50), (60, 60), (70, 70), (80, 80), (90, 90), (55, 55)]), 7.0711,  places=4)
+if __name__ == "__main__":
+    unittest.main()

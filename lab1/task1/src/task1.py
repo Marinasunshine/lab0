@@ -1,28 +1,28 @@
-f = open('../txtf/input.txt')
-n = int(f.readline())
-a = list(map(int, f.readline().split()))
-f.close()
+import utils
+import os
 
-if not 1 <= n <= 10**3:
-    with open('../txtf/output.txt', 'w') as f:
-        f.write('Число не входит в диапазон')
-    exit()
+def insertion_sort(arr):
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        while j >= 0 and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+        arr[j + 1] = key
 
-for element in a:
-    if abs(element) > 10 ** 9:
-        with open('../txtf/output.txt', 'w') as f:
-            f.write('Число превосходит допустимое значение')
-        exit()
+if __name__ == '__main__':
+    print("Lab 1 Task 1:")
+    time_start = utils.start_tracking()
+    input_path, output_path = utils.get_file_paths(os.path.abspath(__file__))
 
-for i in range(1, n):
-    cur_el = a[i]
-    j = i - 1
-    while j >= 0 and a[j] > cur_el:
-        a[j + 1] = a[j]
-        j -= 1
-    a[j + 1] = cur_el
+    data = utils.read_from_file(input_path)
+    a = data[1:]
+    n = data[0]
 
-f = open('../txtf/output.txt', 'w')
-f.write(' '.join(map(str, a)))
-f.close()
+    insertion_sort(a)
 
+    print(f"Input: {data}")
+    print(f"Output: {a}")
+
+    utils.write_in_file(output_path, a)
+    utils.print_time_memory(time_start)

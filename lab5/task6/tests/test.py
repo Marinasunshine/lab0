@@ -1,43 +1,74 @@
-import time
 import unittest
-from lab5.utils import read_data, write_data_3_6, generations
-import tracemalloc
+import utils
 from lab5.task6.src.task6 import priority_queue
 
-#generations("queue", 10, 0,"C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab5/task6/txtf/input.txt")
+class TestPriorityQueue(unittest.TestCase):
 
-def print_time_memory(func):
-    n, data = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab5/task6/txtf/input.txt", 6)
+    def test_empty_operations(self):
+        operations = []
+        expected = []
+        self.assertEqual(priority_queue(operations), expected)
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_add_and_extract_min(self):
+        operations = [
+            "A 3",
+            "A 2",
+            "X",
+            "X"
+        ]
+        expected = ["2", "3"]
+        self.assertEqual(priority_queue(operations), expected)
 
-    func(data)
+    def test_extract_from_empty(self):
+        operations = [
+            "X"
+        ]
+        expected = ["*"]
+        self.assertEqual(priority_queue(operations), expected)
 
-    print("memory usage task 6: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+    def test_decrease_key(self):
+        operations = [
+            "A 3",
+            "A 5",
+            "A 4",
+            "D 2 1",
+            "X",
+            "X",
+            "X"
+        ]
+        expected = ["3", "1", "5"]
+        self.assertEqual(priority_queue(operations), expected)
 
-    tracemalloc.stop()
+    def test_large_input(self):
+        n = 10**4
+        operations = [f"A {i}" for i in range(n, 0, -1)] + ["X"] * n
+        expected = [str(i) for i in range(1, n + 1)]
+        self.assertEqual(priority_queue(operations), expected)
 
-    write_data_3_6(func(data), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab5/task6/txtf/output.txt")
-    print(n, data)
-    print(func(data))
-    print("\n")
-    print("----------------------")
-    return memory, times
+    def test_mixed_operations(self):
+        operations = [
+            "A 3",
+            "X",
+            "X",
+            "A 4",
+            "A 2",
+            "X",
+            "D 1 1",
+            "X"
+        ]
+        expected = ["3", "*", "2", "1"]
+        self.assertEqual(priority_queue(operations), expected)
 
+    def test_should_time_memory(self):
+        n = 10**4
+        operations = [f"A {i}" for i in range(n, 0, -1)] + ["X"] * n
 
-class TestTask(unittest.TestCase):
+        time_start = utils.start_tracking()
+        priority_queue(operations)
+        time, memory = utils.return_time_memory(time_start)
 
-    def test_should_check_time_memori(self):
-        expected_memory = 256
-        expected_time = 2
-        m, t = print_time_memory(priority_queue)
+        self.assertLess(time, 2)
+        self.assertLess(memory, 256)
 
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
-
-
-
+if __name__ == "__main__":
+    unittest.main()

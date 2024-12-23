@@ -1,35 +1,33 @@
-import time
-import tracemalloc
+import unittest
+import utils
+from lab1.task6.src.task6 import bubble_sort
 
-start = time.perf_counter()
-tracemalloc.start()
 
-f = open('../txtf/input.txt')
-n = int(f.readline())
-a = list(map(int, f.readline().split()))
-f.close()
+class BubbleSortTest(unittest.TestCase):
 
-if not 1 <= n <= 10**3:
-    with open('../txtf/output.txt', 'w') as f:
-        f.write('Число не входит в допустимый диапазон')
-    exit()
+    def test_should_example(self):
+        # given
+        array = [10,9,8,7,6,5,4,3,2,1]
+        expected_result = [1,2,3,4,5,6,7,8,9,10]
 
-for element in a:
-    if abs(element) > 10 ** 9:
-        with open('../txtf/output.txt', 'w') as f:
-            f.write('Число превосходит допустимое значение')
-        exit()
+        # when
+        bubble_sort(array)
 
-def bubble_sort(a, reverse):
-    for i in range(n - 1):
-        for j in range(n - i - 1):
-            if (a[j] > a[j + 1] and not reverse) or (a[j] < a[j + 1] and reverse):
-                a[j], a[j + 1] = a[j + 1], a[j]
+        # then
+        self.assertEqual(expected_result, array)
 
-bubble_sort(a,  False)
-f = open('../txtf/output.txt', 'w')
-f.write(' '.join(map(str, a)))
-f.close()
+    def test_should_time_memory(self):
+        # given
+        array = [x for x in range(10**3, -1, -1)]
+        time_start = utils.start_tracking()
 
-print(time.perf_counter() - start, 'c')
-print(tracemalloc.get_traced_memory()[1] / 1024 / 1024, 'Mb')
+        # when
+        bubble_sort(array)
+        result = utils.return_time_memory(time_start)
+
+        # then
+        self.assertLess(result[0], 2)
+        self.assertLess(result[1], 256)
+
+if __name__ == '__main__':
+    unittest.main()

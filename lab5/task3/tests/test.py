@@ -1,48 +1,68 @@
-import time
 import unittest
-from lab5.utils import read_data, write_data_3_6, generations
-import tracemalloc
+import utils
 from lab5.task3.src.task3 import process_packets
 
-generations("packets", 10, 10,"C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab5/task3/txtf/input.txt")
+class TestProcessPackets(unittest.TestCase):
 
-def print_time_memory(func):
-    S, n, data = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab5/task3/txtf/input.txt", 3)
+    def test_no_packets(self):
+        S = 1
+        packets = []
+        expected = []
+        self.assertEqual(process_packets(S, packets), expected)
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_single_packet(self):
+        S = 1
+        packets = [(0, 1)]
+        expected = [0]
+        self.assertEqual(process_packets(S, packets), expected)
 
-    func(S, data)
+    def test_two_packets_buffer_full(self):
+        S = 1
+        packets = [(0, 1), (0, 1)]
+        expected = [0, -1]
+        self.assertEqual(process_packets(S, packets), expected)
 
-    print("memory usage task 3: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+    def test_two_packets_buffer_not_full(self):
+        S = 2
+        packets = [(0, 1), (0, 1)]
+        expected = [0, 1]
+        self.assertEqual(process_packets(S, packets), expected)
 
-    tracemalloc.stop()
+    def test_sequential_packets(self):
+        S = 1
+        packets = [(0, 1), (1, 1)]
+        expected = [0, 1]
+        self.assertEqual(process_packets(S, packets), expected)
 
-    write_data_3_6(func(S, data), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab5/task3/txtf/output.txt")
-    print(S, n, data)
-    print(func(S, data))
-    print("\n")
-    return memory, times
+    def test_overlapping_packets(self):
+        S = 2
+        packets = [(0, 2), (1, 2), (2, 2)]
+        expected = [0, 2, 4]
+        self.assertEqual(process_packets(S, packets), expected)
 
+    def test_large_buffer(self):
+        S = 5
+        packets = [(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6)]
+        expected = [0, 1, 3, 6, 10, -1]
+        self.assertEqual(process_packets(S, packets), expected)
 
-class TestTask(unittest.TestCase):
+    def test_large_input(self):
+        S = 100000
+        n = 100000
+        packets = [(i, 1) for i in range(n)]
+        expected = list(range(n))
+        self.assertEqual(process_packets(S, packets), expected)
 
-    def test_should_check_time_memori_max_value(self):
-        expected_memory = 512
-        expected_time = 10
-        m, t = print_time_memory(process_packets)
+    def test_should_time_memory(self):
+        S = 100000
+        packets = [(i, 1) for i in range(100000)]
 
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
+        time_start = utils.start_tracking()
+        process_packets(S, packets)
+        time, memory = utils.return_time_memory(time_start)
 
-    def test_correct_work(self):
-        self.assertEqual(process_packets(1, []), [])
-        self.assertEqual(process_packets(1, [(0, 0)]), [0])
-        self.assertEqual(process_packets(1, [(0, 1), (0, 1)]), [0, -1])
-        self.assertEqual(process_packets(1, [(0, 1), (1, 1)]), [0, 1])
-        self.assertEqual(process_packets(1, [(0, 0), (0, 0)]), [0, 0])
-        self.assertEqual(process_packets(2, [(0, 1), (3, 1), (10, 1)]), [0, 3, 10])
-        self.assertEqual(process_packets(3, [(0, 2), (1, 2), (2, 2), (3, 2), (4, 2), (5, 2)]), [0, 2, 4, 6, 8, -1])
+        self.assertLess(time, 10)
+        self.assertLess(memory, 512)
+
+if __name__ == "__main__":
+    unittest.main()

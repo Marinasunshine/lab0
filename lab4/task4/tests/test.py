@@ -1,40 +1,58 @@
-import time
 import unittest
-from lab4.utils import read_data, write_data, generations
-import tracemalloc
+import utils
 from lab4.task4.src.task4 import brackets
 
-generations("brackets", 5, 0,"C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab4/task4/txtf/input.txt")
+class TestBrackets(unittest.TestCase):
 
-def print_time_memory(func):
-    data = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab4/task4/txtf/input.txt", 4)
+    def test_empty_string(self):
+        s = ""
+        expected = "Success"
+        self.assertEqual(brackets(s), expected)
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_single_bracket(self):
+        s = "("
+        expected = 1
+        self.assertEqual(brackets(s), expected)
 
-    func(data)
+    def test_correct_brackets(self):
+        s = "[()]{}{[()()]()}"
+        expected = "Success"
+        self.assertEqual(brackets(s), expected)
 
-    print("memory usage task 4: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+    def test_missing_closing_bracket(self):
+        s = "{"
+        expected = 1
+        self.assertEqual(brackets(s), expected)
 
-    tracemalloc.stop()
+    def test_unmatched_closing_bracket(self):
+        s = "{[}]"
+        expected = 3
+        self.assertEqual(brackets(s), expected)
 
-    write_data(func(data), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab4/task4/txtf/output.txt")
-    print(data)
-    print(func(data))
-    print("\n")
-    return memory, times
+    def test_nested_brackets(self):
+        s = "foo(bar[i);"
+        expected = 10
+        self.assertEqual(brackets(s), expected)
 
+    def test_large_input_success(self):
+        s = "[" * 50000 + "]" * 50000
+        expected = "Success"
+        self.assertEqual(brackets(s), expected)
 
-class TestTask(unittest.TestCase):
+    def test_large_input_error(self):
+        s = "[" * 50000 + ")" * 50000
+        expected = 50001
+        self.assertEqual(brackets(s), expected)
 
-    def test_should_check_time_memori(self):
-        expected_memory = 256
-        expected_time = 5
-        m, t = print_time_memory(brackets)
+    def test_should_time_memory(self):
+        s = "[" * 50000 + "]" * 50000
 
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
+        time_start = utils.start_tracking()
+        brackets(s)
+        time, memory = utils.return_time_memory(time_start)
 
+        self.assertLess(time, 5)
+        self.assertLess(memory, 256)
+
+if __name__ == "__main__":
+    unittest.main()

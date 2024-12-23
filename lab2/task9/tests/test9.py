@@ -1,42 +1,47 @@
-import time
 import unittest
-from lab2.utils import *
-import tracemalloc
+import numpy
 from lab2.task9.src.task9 import matrix_mult
+from lab2.task9.src.task9_1 import strassen
 
-generations("matrix", 3,0,"C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab2/task9/txtf/input.txt")
+class MatrixMultiplicationTest(unittest.TestCase):
 
-def print_time_memory(func):
-    n, A, B = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab2/task9/txtf/input.txt")
+    def test_2x2_matrices(self):
+        n = 2
+        A = [[1, 2], [3, 4]]
+        B = [[5, 6], [7, 8]]
+        expected_result = [[19, 22], [43, 50]]
 
-    tracemalloc.start()
-    start_time = time.time()
+        result_naive = matrix_mult(n, A, B)
+        self.assertEqual(result_naive, expected_result)
 
-    func(n, A, B)
-
-    print("memory usage task 9: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
-
-    tracemalloc.stop()
-
-    write_data(func(n, A, B), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab2/task9/txtf/output.txt")
-    print(n, A, B)
-    print(func(n, A, B))
-    print("\n")
-    return memory, times
+        result_strassen = strassen(A, B)
+        self.assertEqual(result_strassen, expected_result)
 
 
-class TestTask(unittest.TestCase):
+    def test_identity_matrix(self):
+        n = 2
+        A = [[1, 2], [3, 4]]
+        B = [[1, 0], [0, 1]]
+        expected_result = A
 
-    def test_should_check_time_memori_value(self):
-        expected_memory = 256
-        expected_time = 2
-        m, t = print_time_memory(matrix_mult)
+        result_naive = matrix_mult(n, A, B)
+        self.assertEqual(result_naive, expected_result)
 
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
+        result_strassen = strassen(A, B)
+        self.assertEqual(result_strassen, expected_result)
 
-if __name__ == "__main__":
+    def test_large_matrix(self):
+        n = 4
+        A = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]
+        B = [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]]
+        expected_result = [[10, 10, 10, 10], [26, 26, 26, 26], [42, 42, 42, 42], [58, 58, 58, 58]]
+
+        result_naive = matrix_mult(n, A, B)
+        self.assertEqual(result_naive, expected_result)
+
+        result_strassen = strassen(A, B)
+        self.assertEqual(result_strassen, expected_result)
+
+
+if __name__ == '__main__':
     unittest.main()

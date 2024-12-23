@@ -1,3 +1,8 @@
+from sympy.codegen import Print
+
+import utils
+import os
+
 def add_matrix(A, B):
     return [[A[i][j] + B[i][j] for j in range(len(A))] for i in range(len(A))]
 
@@ -32,3 +37,21 @@ def strassen(A, B):
         C[i][:mid], C[i][mid:], C[i + mid][:mid], C[i + mid][mid:] = C11[i], C12[i], C21[i], C22[i]
 
     return C
+
+if __name__ == "__main__":
+    print("Lab 2 Task 9_1:")
+    time_start = utils.start_tracking()
+    input_path, output_path = utils.get_file_paths(os.path.abspath(__file__))
+
+    data = utils.read_from_file(input_path)
+    n = data[0]
+    data = data[1:]
+    A = [data[i:i + n] for i in range(0, n * n, n)]
+    B = [data[i:i + n] for i in range(n * n, 2 * n * n, n)]
+    result = strassen(A, B)
+
+    print(f"Input: {data}")
+    print(f"Output: {result}")
+
+    utils.write_in_file(output_path, result)
+    utils.print_time_memory(time_start)

@@ -1,3 +1,5 @@
+import utils
+import os
 import math
 
 def distance(point1, point2):
@@ -36,4 +38,24 @@ def find_closest_pair(points):
     points_x = sorted(points, key=lambda x: x[0])
     points_y = sorted(points, key=lambda y: y[1])
     return closest_pair(points_x, points_y)
+
+if __name__ == "__main__":
+    print("Lab 3 Task 9:")
+    time_start = utils.start_tracking()
+    input_path, output_path = utils.get_file_paths(os.path.abspath(__file__))
+
+    data = utils.read_from_file(input_path)
+    n = int(data[0])
+    points = []
+    for i in range(1, n + 1):
+        x, y = data[2 * i - 1], data[2 * i]  # Достаем координаты
+        points.append((x, y))
+
+    result = f"{find_closest_pair(points):.6}"
+
+    print(f"Input: {data}")
+    print(f"Output: {result}")
+
+    utils.write_in_file(output_path, [result])
+    utils.print_time_memory(time_start)
 

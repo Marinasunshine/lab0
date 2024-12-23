@@ -1,35 +1,29 @@
-f = open('../txtf/input.txt')
-a = list(map(int, f.readline().split()))
-v = int(f.readline())
-f.close()
+import utils
+import os
 
-if not 0 <= len(a) <= 10**3:
-    with open('../txtf/output.txt', 'w') as f:
-        f.write('Число не входит в диапазон')
-    exit()
+def lin_search(arr, V):
+    ind = []
+    for i in range(len(arr)):
+        if arr[i] == V:
+            ind.append(i)
+    if ind:
+        return len(ind), ind
+    else:
+        return -1
 
-for el in a:
-    if -10**3 > el:
-        with open('../txtf/output.txt', 'w') as f:
-            f.write('Число превосходит допустимое значение')
-        exit()
+if __name__ == '__main__':
+    print("Lab 1 Task 4:")
+    time_start = utils.start_tracking()
+    input_path, output_path = utils.get_file_paths(os.path.abspath(__file__))
 
-if 10**3 < v:
-    with open('../txtf/output.txt', 'w') as f:
-        f.write('Число превосходит допустимое значение')
-    exit()
+    data = utils.read_from_file(input_path)
+    a = data[:-1]
+    v = data[-1]
 
-indexes = []
-for i in range(len(a)):
-    if a[i] == v:
-        indexes.append(i)
+    result = lin_search(a, v)
 
-f = open('../txtf/output.txt', 'w')
-if len(indexes) > 1:
-    f.write(f"{len(indexes)}: " + ', '.join(map(str, indexes)))
-elif len(indexes) == 1:
-    f.write(str(indexes[0]))
-else:
-    f.write("-1")
-f.close()
+    print(f"Input: {data}")
+    print(f"Output: {result}")
 
+    utils.write_in_file(output_path, result)
+    utils.print_time_memory(time_start)

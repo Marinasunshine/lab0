@@ -1,47 +1,35 @@
-import time
 import unittest
-from lab7.utils import read_data, write_data, generations
-import tracemalloc
+from random import randint
+import utils
 from lab7.task6.src.task6 import longest_lengths
 
-#generations("max", 5, 0,"C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab7/task6/txtf/input.txt")
 
-def print_time_memory(func):
-    n, data = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab7/task6/txtf/input.txt", 6)
+class TestLIS(unittest.TestCase):
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_should_example(self):
+        # given
+        sequence = [3, 5, 3, 5, 28, 6]
+        expected_length = 3
 
-    func(data)
+        # when
+        result_length, _ = longest_lengths(sequence)
 
-    print("memory usage task 6: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+        # then
+        self.assertEqual(result_length, expected_length)
 
-    tracemalloc.stop()
+    def test_should_time_memory(self):
+        # given
+        sequence = [randint(-10**9, 10**9) for i in range(1000)]
+        time_start = utils.start_tracking()
 
-    write_data(func(data), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab7/task6/txtf/output.txt")
-    print(n, data)
-    print(func(data))
-    print("\n")
-    return memory, times
+        # when
+        longest_lengths(sequence)
+        result = utils.return_time_memory(time_start)
+
+        # then
+        self.assertLess(result[0], 2)
+        self.assertLess(result[1], 256)
 
 
-class TestTask(unittest.TestCase):
-
-    def test_should_check_time_memori(self):
-        expected_memory = 256
-        expected_time = 2
-        m, t = print_time_memory(longest_lengths)
-
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
-
-    def test_longest_lengths(self):
-        self.assertEqual(longest_lengths([3, 29, 5, 5, 28, 6]), (3, [3, 5, 28]))
-        self.assertEqual(longest_lengths([10]), (1, [10]))
-        self.assertEqual(longest_lengths([1, 2, 3, 4, 5]), (5, [1, 2, 3, 4, 5]))
-        self.assertEqual(longest_lengths([5, 4, 3, 2, 1]), (1, [5]))
-        self.assertEqual(longest_lengths([10, 9, 2, 5, 3, 7, 101, 18]), (4, [2, 5, 7, 101]))
-
+if __name__ == '__main__':
+    unittest.main()

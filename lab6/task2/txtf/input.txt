@@ -1,11 +1,4 @@
-10
-del 5503720
-find 4989078
-del 4989078
-find 5619149
-del 6220188
-find 4989078
-find 4937973
-add 9996687 Tom
-del 4937973
-find 5619149
+3
+add 45 dad
+add 456 police
+find 456

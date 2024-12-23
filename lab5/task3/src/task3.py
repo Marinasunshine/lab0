@@ -1,3 +1,6 @@
+import utils
+import os
+
 def process_packets(S, packets):
     finish_time = []
     result = []
@@ -16,3 +19,19 @@ def process_packets(S, packets):
             result.append(start_time)
 
     return result
+
+if __name__ == '__main__':
+    print("Lab 5 Task 3:")
+    time_start = utils.start_tracking()
+    input_path, output_path = utils.get_file_paths(os.path.abspath(__file__))
+
+    data = utils.read_from_file(input_path, type=str).strip().split('\n')
+    S, _ = map(int, data[0].split())
+    packets = [tuple(map(int, line.split())) for line in data[2:] if line.strip()]
+    result = process_packets(S, packets)
+
+    print(f"Input: {data}")
+    print(f"Output: {result}")
+
+    utils.write_in_file(output_path, result, split_str="\n")
+    utils.print_time_memory(time_start)

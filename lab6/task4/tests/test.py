@@ -1,39 +1,72 @@
-import time
 import unittest
-from lab6.utils import read_data, write_data_2, generations
-import tracemalloc
+import utils
 from lab6.task4.src.task4 import array_command
 
-#generations("command", 5, "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab6/task4/txtf/input.txt")
+class TestArrayCommand(unittest.TestCase):
 
-def print_time_memory(func):
-    n, data = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab6/task4/txtf/input.txt", 1)
+    def test_put_and_get(self):
+        commands = [
+            "put zero a",
+            "put one b",
+            "put two c",
+            "get zero",
+            "get one",
+            "get two"
+        ]
+        expected = ["a", "b", "c"]
+        self.assertEqual(array_command(commands), expected)
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_get_not_found(self):
+        commands = [
+            "get unknown"
+        ]
+        expected = ["<none>"]
+        self.assertEqual(array_command(commands), expected)
 
-    func(data)
+    def test_delete_and_get(self):
+        commands = [
+            "put zero a",
+            "delete zero",
+            "get zero"
+        ]
+        expected = ["<none>"]
+        self.assertEqual(array_command(commands), expected)
 
-    print("memory usage task 4: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+    def test_prev_and_next(self):
+        commands = [
+            "put one b",
+            "put two c",
+            "put three d",
+            "prev two",
+            "next two",
+            "prev one",
+            "next three"
+        ]
+        expected = ["b", "d", "<none>", "<none>"]
+        self.assertEqual(array_command(commands), expected)
 
-    tracemalloc.stop()
+    def test_complex_operations(self):
+        commands = [
+            "put one b",
+            "put two c",
+            "put three d",
+            "delete two",
+            "get two",
+            "prev three",
+            "next one"
+        ]
+        expected = ["<none>", "b", "d"]
+        self.assertEqual(array_command(commands), expected)
 
-    write_data_2(func(data), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab6/task4/txtf/output.txt")
-    print(n, data)
-    print(func(data))
-    print("\n")
-    return memory, times
+    def test_should_time_memory(self):
+        time_start = utils.start_tracking()
 
+        commands = [f"put key{i} value{i}" for i in range(5 * 10**4)] + [f"get key{i}" for i in range(5 * 10**4)]
+        array_command(commands)
 
-class TestTask(unittest.TestCase):
+        time, memory = utils.return_time_memory(time_start)
+        self.assertLess(time, 4)
+        self.assertLess(memory, 256)
 
-    def test_should_check_time_memori(self):
-        expected_memory = 256
-        expected_time = 4
-        m, t = print_time_memory(array_command)
-
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
+if __name__ == '__main__':
+    unittest.main()

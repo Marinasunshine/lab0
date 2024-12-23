@@ -1,42 +1,66 @@
-import time
 import unittest
-from lab2.utils import *
-import tracemalloc
+import utils
 from lab2.task2.src.task2 import merge_sort
 
-generations("random", 5, 0,"C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab2/task2/txtf/input.txt")
+class MergeSortTest(unittest.TestCase):
 
-def print_time_memory(func):
-    n, data = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab2/task2/txtf/input.txt")
+    def test_should_example_1(self):
+        # given
+        input_data = [9, 7, 5, 8]
+        expected_result = [5, 7, 8, 9]
 
-    tracemalloc.start()
-    start_time = time.time()
+        # when
+        output = merge_sort(input_data, 0, len(input_data) - 1)
 
-    with open("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab2/task2/txtf/output.txt", "w") as f:
-        func(data, 0, len(data) - 1, f)
+        # then
+        self.assertEqual(output, expected_result)
 
-    print("memory usage task 2: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+    def test_should_example_2(self):
+        # given
+        input_data = [1, 2, 1, 8, 3, 6, 3, 4]
+        expected_result = [1, 1, 2, 3, 3, 4, 6, 8]
 
-    tracemalloc.stop()
+        # when
+        output = merge_sort(input_data, 0, len(input_data) - 1)
 
-    write_data(data,"C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab2/task2/txtf/output.txt")
-    print(n, data)
-    print("\n")
-    return memory, times
+        # then
+        self.assertEqual(output, expected_result)
+
+    def test_should_edge_case_single_element(self):
+        # given
+        input_data = [1]
+        expected_result = [1]
+
+        # when
+        output = merge_sort(input_data, 0, len(input_data) - 1)
+
+        # then
+        self.assertEqual(output, expected_result)
+
+    def test_should_edge_case_empty(self):
+        # given
+        input_data = []
+        expected_result = []
+
+        # when
+        output = merge_sort(input_data, 0, len(input_data) - 1)
+
+        # then
+        self.assertEqual(output, expected_result)
 
 
-class TestTask(unittest.TestCase):
+    def test_should_time_memory(self):
+        # given
+        input_data = [i for i in range(100000, 0, -1)]
+        time_start = utils.start_tracking()
 
-    def test_should_check_time_memori_value(self):
-        expected_memory = 256
-        expected_time = 2
-        m, t = print_time_memory(merge_sort)
+        # when
+        merge_sort(input_data, 0, len(input_data) - 1)
+        result = utils.return_time_memory(time_start)
 
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
+        # then
+        self.assertLess(result[0], 3)
+        self.assertLess(result[1], 256)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

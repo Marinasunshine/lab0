@@ -1,39 +1,42 @@
-import time
 import unittest
-from lab3.utils import *
-import tracemalloc
 from lab3.task2.src.task2 import generate_worst_case
+import utils
 
-#generation_random_n("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab3/task2/txtf/input.txt")
+class TestGenerateWorstCase(unittest.TestCase):
 
-def print_time_memory(func):
-    n = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab3/task2/txtf/input.txt", 2)
+    def test_smallest_case(self):
+        n = 3
+        expected = [3, 2, 1]
+        self.assertEqual(generate_worst_case(n), expected)
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_small_case(self):
+        n = 5
+        expected = [5, 4, 3, 2, 1]
+        self.assertEqual(generate_worst_case(n), expected)
 
-    func(n)
+    def test_case_with_n_equals_7(self):
+        n = 7
+        expected = [7, 6, 5, 4, 3, 2, 1]
+        self.assertEqual(generate_worst_case(n), expected)
 
-    print("memory usage task 2: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+    def test_large_case(self):
+        n = 10
+        expected = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+        self.assertEqual(generate_worst_case(n), expected)
 
-    tracemalloc.stop()
+    def test_edge_case_large_n(self):
+        n = 100
+        expected = list(range(100, 0, -1))
+        self.assertEqual(generate_worst_case(n), expected)
 
-    write_data(func(n), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab3/task2/txtf/output.txt")
-    print(n)
-    print(func(n))
-    print("\n")
-    return memory, times
+    def test_should_time_memory(self):
+        n = 1000000
+        time_start = utils.start_tracking()
+        generate_worst_case(n)
+        time, memory = utils.return_time_memory(time_start)
 
+        self.assertLess(time, 2)
+        self.assertLess(memory, 256)
 
-class TestTask(unittest.TestCase):
-
-    def test_should_check_time_memori_value(self):
-        expected_memory = 256
-        expected_time = 2
-        m, t  = print_time_memory(generate_worst_case)
-
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
+if __name__ == "__main__":
+    unittest.main()

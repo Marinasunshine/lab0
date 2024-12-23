@@ -1,4 +1,3 @@
-McCain 8
-ivanov 5
-petr 1
-tourist 3
+McCain 1
+Obama 6
+tourist 8

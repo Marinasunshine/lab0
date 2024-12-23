@@ -1,41 +1,53 @@
-import time
 import unittest
-from lab4.utils import read_data, write_data, generations
-import tracemalloc
 from lab4.task8.src.task8 import postfix
+import utils
 
-generations("postfix", 5, 0,"C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab4/task8/txtf/input.txt")
+class TestPostfix(unittest.TestCase):
 
-def print_time_memory(func):
-    n, data= read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab4/task8/txtf/input.txt", 8)
+    def test_single_number(self):
+        data = ["5"]
+        expected = 5
+        self.assertEqual(postfix(data), expected)
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_simple_addition(self):
+        data = ["3", "4", "+"]
+        expected = 7
+        self.assertEqual(postfix(data), expected)
 
-    func(data)
+    def test_simple_subtraction(self):
+        data = ["10", "3", "-"]
+        expected = 7
+        self.assertEqual(postfix(data), expected)
 
-    print("memory usage task 8: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+    def test_simple_multiplication(self):
+        data = ["6", "2", "*"]
+        expected = 12
+        self.assertEqual(postfix(data), expected)
 
-    tracemalloc.stop()
+    def test_combination_operations(self):
+        data = ["3", "4", "+", "2", "*"]
+        expected = 14
+        self.assertEqual(postfix(data), expected)
 
-    write_data(func(data), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab4/task8/txtf/output.txt")
-    print(n, data)
-    print(func(data))
-    print("\n")
-    print("----------------------")
-    return memory, times
+    def test_complex_expression(self):
+        data = ["8", "9", "+", "1", "7", "-", "*"]
+        expected = -102
+        self.assertEqual(postfix(data), expected)
 
+    def test_edge_case_large_numbers(self):
+        data = ["-102", "8", "9", "+", "1", "7", "-", "*"]
+        expected = -102
+        self.assertEqual(postfix(data), expected)
 
-class TestTask(unittest.TestCase):
+    def test_should_time_memory(self):
+        data = ["1000000", "999999", "+", "100000", "*"] * 10000
 
-    def test_should_check_time_memori(self):
-        expected_memory = 256
-        expected_time = 2
-        m, t = print_time_memory(postfix)
+        time_start = utils.start_tracking()
+        postfix(data)
+        time, memory = utils.return_time_memory(time_start)
 
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
+        self.assertLess(time, 2)
+        self.assertLess(memory, 256)
 
+if __name__ == "__main__":
+    unittest.main()

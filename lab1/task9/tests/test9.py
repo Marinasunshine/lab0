@@ -1,33 +1,35 @@
-import time
-import tracemalloc
+import unittest
+import utils
+from lab1.task9.src.task9 import binary_numbers
 
-start = time.perf_counter()
-tracemalloc.start()
 
-f = open('../txtf/input.txt')
-a, b = f.readline().split()
-f.close()
+class AddingBinaryNumbersTest(unittest.TestCase):
 
-n = len(a)
+    def test_should_example(self):
+        # given
+        number1 = "1111"
+        number2 = "1111"
+        expected_result = [1,1,1,1,0]
 
-if not 1 <= n <= 10**3:
-    with open('../txtf/output.txt', 'w') as f:
-        f.write('Число не входит в диапазон')
-    exit()
+        # when
+        result = binary_numbers(number1, number2)
 
-carry = 0
-c = ['0'] * (n + 1)
+        # then
+        self.assertEqual(expected_result, result)
 
-for i in range(n - 1, -1, -1):
-    sum_bit = int(a[i]) + int(b[i]) + carry
-    c[i + 1] = str(sum_bit % 2)
-    carry = sum_bit // 2
+    def test_should_time_memory(self):
+        # given
+        number1 = "1" * 10**3
+        number2 = "1" * 10**3
+        time_start = utils.start_tracking()
 
-c[0] = str(carry)
+        # when
+        binary_numbers(number1, number2)
+        result = utils.return_time_memory(time_start)
 
-f = open('../txtf/output.txt', 'w')
-f.write(''.join(c).lstrip('0') or '0')
-f.close()
+        # then
+        self.assertLess(result[0], 2)
+        self.assertLess(result[1], 256)
 
-print(time.perf_counter() - start, 'c')
-print(tracemalloc.get_traced_memory()[1] / 1024 / 1024, 'Mb')
+if __name__ == '__main__':
+    unittest.main()

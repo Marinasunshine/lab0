@@ -1,3 +1,6 @@
+import utils
+import os
+
 def stack_max(commands):
     stack = []
     max_stack = []
@@ -19,3 +22,19 @@ def stack_max(commands):
                 result.append(str(max_stack[-1]))
 
     return result
+
+if __name__ == '__main__':
+    print("Lab 4 Task 5:")
+    time_start = utils.start_tracking()
+    input_path, output_path = utils.get_file_paths(os.path.abspath(__file__))
+
+    data = utils.read_from_file(input_path, type=str)
+    data = data.split("\n")
+    commands = [line.split() for line in data[1:]]
+    result = stack_max(commands)
+
+    print(f"Input: {data}")
+    print(f"Output: {result}")
+
+    utils.write_in_file(output_path, result, split_str="\n")
+    utils.print_time_memory(time_start)

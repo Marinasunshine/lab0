@@ -1,40 +1,48 @@
-import time
 import unittest
-from lab4.utils import read_data, write_data_7, generations
-import tracemalloc
 from lab4.task7.src.task7 import find_max
+import utils
 
-generations("moving_max", 5, 2,"C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab4/task7/txtf/input.txt")
+class TestFindMax(unittest.TestCase):
 
-def print_time_memory(func):
-    n, data, m = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab4/task7/txtf/input.txt", 7)
+    def test_single_element_window(self):
+        n = 5
+        arr = [4, 3, 2, 1, 5]
+        m = 1
+        expected = [4, 3, 2, 1, 5]
+        self.assertEqual(find_max(n, arr, m), expected)
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_window_size_one(self):
+        n = 6
+        arr = [3, 5, 7, 2, 8, 6]
+        m = 1
+        expected = [3, 5, 7, 2, 8, 6]
+        self.assertEqual(find_max(n, arr, m), expected)
 
-    func(n, data, m)
+    def test_window_size_equals_array_length(self):
+        n = 6
+        arr = [3, 5, 7, 2, 8, 6]
+        m = 6
+        expected = [8]
+        self.assertEqual(find_max(n, arr, m), expected)
 
-    print("memory usage task 7: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+    def test_window_size_mid_range(self):
+        n = 8
+        arr = [7, 5, 6, 6, 3, 1, 5, 2]
+        m = 4
+        expected = [7, 6, 6, 6, 5]
+        self.assertEqual(find_max(n, arr, m), expected)
 
-    tracemalloc.stop()
+    def test_should_time_memory(self):
+        n = 100000
+        arr = [i % 1000 for i in range(n)]
+        m = 100
 
-    write_data_7(func(n, data, m), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab4/task7/txtf/output.txt")
-    print(n, data, m)
-    print(func(n, data, m))
-    print("\n")
-    return memory, times
+        time_start = utils.start_tracking()
+        find_max(n, arr, m)
+        time, memory = utils.return_time_memory(time_start)
 
+        self.assertLess(time, 5)
+        self.assertLess(memory, 512)
 
-class TestTask(unittest.TestCase):
-
-    def test_should_check_time_memori(self):
-        expected_memory = 512
-        expected_time = 5
-        m, t = print_time_memory(find_max)
-
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
-
+if __name__ == "__main__":
+    unittest.main()

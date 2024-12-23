@@ -1,51 +1,61 @@
-import time
 import unittest
-from lab5.utils import read_data, write_data, generations
-import tracemalloc
+import utils
 from lab5.task2.src.task2 import find_height
 
-generations("tree", 10, 0,"C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab5/task2/txtf/input.txt")
+class TestFindHeight(unittest.TestCase):
 
-def print_time_memory(func):
-    n, data = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab5/task2/txtf/input.txt", 1)
+    def test_single_node(self):
+        parents = [-1]
+        n = 1
+        expected = 1
+        self.assertEqual(find_height(parents, n), expected)
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_small_tree(self):
+        parents = [4, -1, 4, 1, 1]
+        n = 5
+        expected = 3
+        self.assertEqual(find_height(parents, n), expected)
 
-    func(data, n)
+    def test_another_small_tree(self):
+        parents = [-1, 0, 4, 0, 3]
+        n = 5
+        expected = 4
+        self.assertEqual(find_height(parents, n), expected)
 
-    print("memory usage task 2: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+    def test_linear_tree(self):
+        parents = [-1, 0, 1, 2, 3]
+        n = 5
+        expected = 5
+        self.assertEqual(find_height(parents, n), expected)
 
-    tracemalloc.stop()
+    def test_star_tree(self):
+        parents = [-1, 0, 0, 0, 0]
+        n = 5
+        expected = 2
+        self.assertEqual(find_height(parents, n), expected)
 
-    write_data(func(data, n), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab5/task2/txtf/output.txt")
-    print(n, data)
-    print(func(data, n))
-    print("\n")
-    return memory, times
+    def test_large_tree(self):
+        n = 10**5
+        parents = [-1] + [0] * (n - 1)
+        expected = 2
+        self.assertEqual(find_height(parents, n), expected)
 
+    def test_large_linear_tree(self):
+        n = 10**5
+        parents = [-1] + [i for i in range(n - 1)]
+        expected = n
+        self.assertEqual(find_height(parents, n), expected)
 
-class TestTask(unittest.TestCase):
+    def test_should_time_memory(self):
+        n = 10**5
+        parents = [-1] + [0] * (n - 1)
 
-    def test_should_check_time_memori_max_value(self):
-        expected_memory = 512
-        expected_time = 3
-        m, t = print_time_memory(find_height)
+        time_start = utils.start_tracking()
+        find_height(parents, n)
+        time, memory = utils.return_time_memory(time_start)
 
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
+        self.assertLess(time, 3)
+        self.assertLess(memory, 512)
 
-    def test_correct_work(self):
-        self.assertEqual(find_height([4, -1, 4, 1, 1], 5), 3)
-        self.assertEqual(find_height([-1, 0, 4, 0, 3], 5), 4)
-        self.assertEqual(find_height([1, -1, 2], 3), 2)
-        self.assertEqual(find_height([-1], 1), 1)
-        self.assertEqual(find_height([-1, 2, 5, 4, 5, 0], 6), 4)
-        self.assertEqual(find_height([3, -1, 1, 1, 1, 1], 6), 3)
-
-
-
-
+if __name__ == '__main__':
+    unittest.main()

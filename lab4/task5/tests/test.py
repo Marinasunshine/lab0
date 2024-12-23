@@ -1,40 +1,61 @@
-import time
 import unittest
-from lab4.utils import read_data, write_data, generations
-import tracemalloc
+import utils
 from lab4.task5.src.task5 import stack_max
 
-#generations("stack_max", 5, 0,"C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab4/task5/txtf/input.txt")
+class TestStackMax(unittest.TestCase):
 
-def print_time_memory(func):
-    n, data = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab4/task5/txtf/input.txt", 5)
+    def test_empty_commands(self):
+        commands = []
+        expected = []
+        self.assertEqual(stack_max(commands), expected)
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_single_push_and_max(self):
+        commands = [
+            ["push", "10"],
+            ["max"]
+        ]
+        expected = ["10"]
+        self.assertEqual(stack_max(commands), expected)
 
-    func(data)
+    def test_multiple_push_pop_and_max(self):
+        commands = [
+            ["push", "2"],
+            ["push", "1"],
+            ["max"],
+            ["pop"],
+            ["max"]
+        ]
+        expected = ["2", "2"]
+        self.assertEqual(stack_max(commands), expected)
 
-    print("memory usage task 5: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+    def test_large_input_success(self):
+        n = 100000
+        commands = [["push", str(i)] for i in range(1, n + 1)] + [["max"], ["pop"]] * n
+        expected = [str(i) for i in range(n, 0, -1)]
+        self.assertEqual(stack_max(commands), expected)
 
-    tracemalloc.stop()
+    def test_mixed_operations(self):
+        commands = [
+            ["push", "5"],
+            ["push", "1"],
+            ["push", "7"],
+            ["max"],
+            ["pop"],
+            ["max"]
+        ]
+        expected = ["7", "5"]
+        self.assertEqual(stack_max(commands), expected)
 
-    write_data(func(data), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab4/task5/txtf/output.txt")
-    print(n, data)
-    print(func(data))
-    print("\n")
-    return memory, times
+    def test_should_time_memory(self):
+        n = 100000
+        commands = [["push", str(i)] for i in range(1, n + 1)] + [["max"], ["pop"]] * n
 
+        time_start = utils.start_tracking()
+        stack_max(commands)
+        time, memory = utils.return_time_memory(time_start)
 
-class TestTask(unittest.TestCase):
+        self.assertLess(time, 5)
+        self.assertLess(memory, 512)
 
-    def test_should_check_time_memori(self):
-        expected_memory = 512
-        expected_time = 5
-        m, t = print_time_memory(stack_max)
-
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
-
+if __name__ == "__main__":
+    unittest.main()

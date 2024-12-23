@@ -1,3 +1,6 @@
+import utils
+import os
+
 def merge(l, r):
     res = []
     i = j = inversions = 0
@@ -27,3 +30,19 @@ def merge_sort(a):
     merged, split_inv = merge(l, r)
 
     return merged, l_inversions + r_inversions + split_inv
+
+if __name__ == "__main__":
+    print("Lab 2 Task 3:")
+    time_start = utils.start_tracking()
+    input_path, output_path = utils.get_file_paths(os.path.abspath(__file__))
+
+    data = utils.read_from_file(input_path)
+    n = data[0]
+    a = data[1:]
+    sort, result = merge_sort(a)
+
+    print(f"Input: {data}")
+    print(f"Output: {result}")
+
+    utils.write_in_file(output_path, str(result))
+    utils.print_time_memory(time_start)

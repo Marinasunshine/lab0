@@ -1,43 +1,30 @@
-import time
-import tracemalloc
+import unittest
+from lab1.task4.src.task4 import lin_search
 
-start = time.perf_counter()
-tracemalloc.start()
 
-f = open('../txtf/input.txt')
-a = list(map(int, f.readline().split()))
-v = int(f.readline())
-f.close()
+class LinearSearchTest(unittest.TestCase):
 
-if not 0 <= len(a) <= 10**3:
-    with open('../txtf/output.txt', 'w') as f:
-        f.write('Число не входит в диапазон')
-    exit()
+    def test_should_example(self):
+        # given
+        array = [1,2,3,4,5,6,7,8,7,7]
+        expected_result = (3, [6, 8, 9])
 
-for el in a:
-    if -10**3 > el:
-        with open('../txtf/output.txt', 'w') as f:
-            f.write('Число превосходит допустимое значение')
-        exit()
+        # when
+        result = lin_search(array, 7)
 
-if 10**3 < v:
-    with open('../txtf/output.txt', 'w') as f:
-        f.write('Число превосходит допустимое значение')
-    exit()
+        # then
+        self.assertEqual(expected_result, result)
 
-indexes = []
-for i in range(len(a)):
-    if a[i] == v:
-        indexes.append(i)
+    def test_should_no_target_in_array(self):
+        # given
+        array = [x for x in range(10**3)]
+        expected_result = -1
 
-f = open('../txtf/output.txt', 'w')
-if len(indexes) > 1:
-    f.write(f"{len(indexes)}: " + ', '.join(map(str, indexes)))
-elif len(indexes) == 1:
-    f.write(str(indexes[0]))
-else:
-    f.write("-1")
-f.close()
+        # when
+        result = lin_search(array, [])
 
-print(time.perf_counter() - start, 'c')
-print(tracemalloc.get_traced_memory()[1] / 1024 / 1024, 'Mb')
+        # then
+        self.assertEqual(expected_result, result)
+
+if __name__ == '__main__':
+    unittest.main()

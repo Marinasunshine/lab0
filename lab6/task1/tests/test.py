@@ -1,41 +1,36 @@
-import time
 import unittest
-from lab6.utils import read_data, write_data_2, generations
-import tracemalloc
+import utils
 from lab6.task1.src.task1 import set_operations
 
-generations("set", 5, "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab6/task1/txtf/input.txt")
 
-def print_time_memory(func):
-    n, data = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab6/task1/txtf/input.txt", 1)
+class SetTest(unittest.TestCase):
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_should_example(self):
+        # given
+        expected_result = ["Y", "N", "N"]
 
-    func(data)
+        # when
+        commands = ["A 2", "A 5", "A 3", "? 2", "? 4", "A 2", "D 2", "? 2"]
+        result = set_operations(commands)
 
-    print("memory usage task 1: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+        # then
+        self.assertEqual(result, expected_result)
 
-    tracemalloc.stop()
+    def test_should_time_memory(self):
+        # given
+        time_start = utils.start_tracking()
 
-    write_data_2(func(data), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab6/task1/txtf/output.txt")
-    print(n, data)
-    print(func(data))
-    print("\n")
-    return memory, times
+        # when
+        commands = [f"A {i}" for i in range(5 * 10**4)] + [f"? {i}" for i in range(5 * 10**4)]
+        result = set_operations(commands)
+
+        # then
+        time, memory = utils.return_time_memory(time_start)
+        self.assertLess(time, 2)
+        self.assertLess(memory, 256)
 
 
-class TestTask(unittest.TestCase):
-
-    def test_should_check_time_memori(self):
-        expected_memory = 256
-        expected_time = 2
-        m, t = print_time_memory(set_operations)
-
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
+if __name__ == '__main__':
+    unittest.main()
 
 

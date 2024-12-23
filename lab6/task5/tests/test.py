@@ -1,40 +1,56 @@
-import time
 import unittest
-from lab6.utils import read_data, write_data, generations
-import tracemalloc
+import utils
 from lab6.task5.src.task5 import vote
 
-generations("votes", 5, "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab6/task5/txtf/input.txt")
+class TestVote(unittest.TestCase):
 
-def print_time_memory(func):
-    data = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab6/task5/txtf/input.txt", 5)
+    def test_single_candidate(self):
+        data = [
+            "McCain 10",
+            "McCain 5",
+            "McCain 1"
+        ]
+        expected = ["McCain 16"]
+        self.assertEqual(vote(data), expected)
 
-    tracemalloc.start()
-    start_time = time.time()
+    def test_multiple_candidates(self):
+        data = [
+            "McCain 10",
+            "Obama 9",
+            "Obama 8",
+            "McCain 5"
+        ]
+        expected = ["McCain 15", "Obama 17"]
+        self.assertEqual(vote(data), expected)
 
-    func(data)
+    def test_lexicographical_order(self):
+        data = [
+            "ivanov 100",
+            "ivanov 500",
+            "ivanov 300",
+            "petr 70",
+            "tourist 1",
+            "tourist 2"
+        ]
+        expected = ["ivanov 900", "petr 70", "tourist 3"]
+        self.assertEqual(vote(data), expected)
 
-    print("memory usage task 5: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    memory = tracemalloc.get_traced_memory()[1] / 2**20
-    times = time.time() - start_time
+    def test_single_vote(self):
+        data = [
+            "bur 1"
+        ]
+        expected = ["bur 1"]
+        self.assertEqual(vote(data), expected)
 
-    tracemalloc.stop()
+    def test_should_time_memory(self):
+        time_start = utils.start_tracking()
 
-    write_data(func(data), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab6/task5/txtf/output.txt")
-    print(data)
-    print(func(data))
-    print("\n")
-    print("----------------------")
-    return memory, times
+        data = [f"candidate{i % 10} {i}" for i in range(10**5)]
+        vote(data)
 
+        time, memory = utils.return_time_memory(time_start)
+        self.assertLess(time, 2)
+        self.assertLess(memory, 64)
 
-class TestTask(unittest.TestCase):
-
-    def test_should_check_time_memori(self):
-        expected_memory = 64
-        expected_time = 2
-        m, t = print_time_memory(vote)
-
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
-        self.assertLessEqual(m, expected_memory, f"Значение {m} превышает порог {expected_memory}")
+if __name__ == '__main__':
+    unittest.main()

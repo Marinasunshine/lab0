@@ -1,46 +1,62 @@
-import time
 import unittest
-from lab7.utils import read_data, write_data, generations
-import tracemalloc
+from random import randint
 from lab7.task4.src.task4 import length
+import utils
 
-#generations("sequence", 5, 5,"C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab7/task4/txtf/input.txt")
+class TestLongestCommonSubsequence(unittest.TestCase):
+    def test_example_1(self):
+        # Given
+        seq1 = [2, 7, 5]
+        seq2 = [2, 5]
+        expected_result = 2
 
-def print_time_memory(func):
-    a, data, b, data2 = read_data("C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab7/task4/txtf/input.txt", 4)
+        # When
+        result = length(seq1, seq2)
 
-    tracemalloc.start()
-    start_time = time.time()
+        # Then
+        self.assertEqual(result, expected_result)
 
-    func(data, data2)
+    def test_example_2(self):
+        # Given
+        seq1 = [1, 2, 3, 4]
+        seq2 = [7]
+        expected_result = 0
 
-    print("memory usage task 4: ", tracemalloc.get_traced_memory()[1] / 2**20, "Mb")
-    print("--- %s seconds ---" % (time.time() - start_time))
-    times = time.time() - start_time
+        # When
+        result = length(seq1, seq2)
 
-    tracemalloc.stop()
+        # Then
+        self.assertEqual(result, expected_result)
 
-    write_data(func(data, data2), "C:/Users/zabot/.virtualenvs/algorithms-and-data-structures/lab7/task4/txtf/output.txt")
-    print(a, data, b, data2)
-    print(func(data, data2))
-    print("\n")
-    return times
+    def test_example_3(self):
+        # Given
+        seq1 = [2, 7, 6, 3]
+        seq2 = [5, 2, 8, 7]
+        expected_result = 2
 
+        # When
+        result = length(seq1, seq2)
 
-class TestTask(unittest.TestCase):
+        # Then
+        self.assertEqual(result, expected_result)
 
-    def test_should_check_time_memori_max_value(self):
-        expected_time = 1
-        t = print_time_memory(length)
+    def test_large_input(self):
+        # Given
+        n, m = 100, 100
+        seq1 = [randint(-10**9, 10**9) for _ in range(n)]
+        seq2 = [randint(-10**9, 10**9) for _ in range(m)]
 
-        self.assertLessEqual(t, expected_time, f"Значение {t} превышает порог {expected_time}")
+        # When
+        time_start = utils.start_tracking()
+        result = length(seq1, seq2)
+        elapsed_time, memory_usage = utils.return_time_memory(time_start)
 
-    def test_length(self):
-        self.assertEqual(length([1, 2, 3, 4, 5], [1, 2, 3, 4, 5]), 5)
-        self.assertEqual(length([2, 7, 5], [2, 5]), 2)
-        self.assertEqual(length([1, 2, 3, 4], [5, 2, 8, 7]), 1)
-        self.assertEqual(length([2, 7, 8, 3], [5, 2, 8, 7]), 2)
-        self.assertEqual(length([10], [10]), 1)
-        self.assertEqual(length([1, 2, 3], [4, 5, 6]), 0)
+        # Then
+        self.assertIsInstance(result, int)
+        self.assertGreaterEqual(result, 0)
+        self.assertLess(elapsed_time, 1)
+
+if __name__ == '__main__':
+    unittest.main()
 
 

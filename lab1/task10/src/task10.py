@@ -1,32 +1,39 @@
-f = open('../txtf/input.txt', 'r')
-n = int(f.readline())
-s = f.readline()
-f.close()
+import utils
+import os
 
-if not 1 <= n <= 10**5:
-    with open('../txtf/output.txt', 'w') as f:
-        f.write('Число не входит в допустимый диапазон')
-    exit()
+def palindrome(s):
+    freq = {}
+    for char in s:
+        if char in freq:
+            freq[char] += 1
+        else:
+            freq[char] = 1
+    left_half = []
+    middle_char = ''
 
-counts = {}
-for symbol in s:
-    if symbol in counts:
-        counts[symbol] += 1
-    else:
-        counts[symbol] = 1
+    for char in sorted(freq.keys()):
+        count = freq[char]
+        pair_count = count // 2
+        left_half.append(char * pair_count)
+        if count % 2 == 1 and middle_char == '':
+            middle_char = char
 
-left_part = []
-middle_symbol = ''
+    left_half_str = ''.join(left_half)
+    palindrome = left_half_str + middle_char + left_half_str[::-1]
 
-for symbol in sorted(counts.keys()):
-    count = counts[symbol]
-    left_part.append(symbol * (count // 2))
-    if count % 2 == 1 and middle_symbol == '':
-        middle_symbol = symbol
+    return palindrome
 
-left = ''.join(left_part)
-palindrome = left + middle_symbol + left[::-1]
+if __name__ == '__main__':
+    print("Lab 1 Task 10:")
+    time_start = utils.start_tracking()
+    input_path, output_path = utils.get_file_paths(os.path.abspath(__file__))
 
-f = open('../txtf/output.txt', 'w')
-f.write(palindrome)
-f.close()
+    data = utils.read_from_file(input_path, type = str)
+    a = data
+    result = palindrome(a)
+
+    print(f"Input: {data}")
+    print(f"Output: {result}")
+
+    utils.write_in_file(output_path, [result])
+    utils.print_time_memory(time_start)
