@@ -24,3 +24,18 @@
 * GitHub — платформа для хостинга репозиториев
 * Markdown — язык разметки для оформления документации
 * PyCharm - интегрированная среда разработки на языке Python
+
+### Инструкция по запуску
+1. Клонируйте репозиторий
+   ```bash
+   git clone https://github.com/Marinasunshine/algorithms-and-data-structures.git
+2. Перейдите в папку с проектом
+   ```bash
+   cd algorithms-and-data-structures
+4. Запуск всех задач
+   ```
+   $env:PYTHONPATH = (Get-Location).Path
+   Get-ChildItem -Recurse -Filter *.py -Path lab*/*/src | ForEach-Object { python $_.FullName }
+6. Запуск всех тестов
+   ```bash
+   pytest
